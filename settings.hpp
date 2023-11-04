@@ -1,9 +1,10 @@
 namespace Canvas {
-    char border = '#';
-    char snake = 'S';
-    char apple = 'a';
-    char blank = ' ';
+    char* border = "#";
+    char* snake = "0";
+    char* body = "o";
+    char* apple = "a";
+    double FPL = 5.00;
     
-    int width = 60;
-    int height = 20;
+    int width = 30;
+    int height = 10;
 }

@@ -1,11 +1,12 @@
 #include <vector>
+enum directions {UP, DOWN, LEFT, RIGHT, NONE};
 
 class Snake
 {
     public:
         int pos[2];
         int length;
-        char direction = 'e';
+        directions direction = RIGHT;
         int screen_width;
         int screen_height;
 
@@ -22,39 +23,39 @@ class Snake
 
         void move() {
             switch (direction) {
-                case 'n':
+                case DOWN:
                     if (pos[1] < screen_height) {
-                        pos[1] += 1;
+                        pos[1]++;
                     } else {
-                        pos[0] = screen_height;
-                        direction = ' ';
+                        pos[1] = screen_height;
+                        direction = NONE;
                     }
                     break;
-                case 's':
-                    if (pos[1] > 0) {
-                        pos[1] -= 1;
+                case UP:
+                    if (pos[1] > 1) {
+                        pos[1]--;
                     } else {
-                        pos[1] = 0;
-                        direction = ' ';
+                        pos[1] = 1;
+                        direction = NONE;
                     }
                     break;
-                case 'e':
+                case RIGHT:
                     if (pos[0] < screen_width) {
-                        pos[0] += 1;
+                        pos[0]++;
                     } else {
                         pos[0] = screen_width;
-                        direction = ' ';
+                        direction = NONE;
                     }
                     break;
-                case 'w':
+                case LEFT:
                     if (pos[0] > 1) {
-                        pos[0] -= 1;
+                        pos[0]--;
                     } else {
                         pos[0] = 1;
-                        direction = ' ';
+                        direction = NONE;
                     }
                     break;
-                default: break;
+                case NONE: break;
             }
         }
 };
@@ -68,6 +69,4 @@ class Apple
             pos[0] = x_pos;
             pos[1] = y_pos;
         }
-
-
 };

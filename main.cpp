@@ -1,14 +1,15 @@
 #include <iostream>
 #include "canv.hpp"
-using namespace std;
 
 int main() {
     Game g(Canvas::width, Canvas::height);
-    while (true) {
+    while (g.alive) {
         g.run();
     }
-
-    cout << "You died!" << endl;
+    g.cleanUp();
+    
+    
+    std::cout << "You died!" << std::endl;
 
     return 0;
 }
