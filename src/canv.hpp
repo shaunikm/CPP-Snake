@@ -114,6 +114,7 @@ class Game
             endwin();
             delete player;
             delete target;
+            delete body;
         }
 
         void drawCanvas() {
