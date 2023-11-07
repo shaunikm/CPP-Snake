@@ -1,4 +1,9 @@
-#include <iostream>
+/**
+ * Simple console-based snake game.
+ * 
+ * @author Shaunik Musukula
+ * @version 1.1
+*/
 #include "canv.hpp"
 
 int main() {
@@ -7,9 +12,6 @@ int main() {
         g.run();
     }
     g.cleanUp();
-    
-    
-    std::cout << "You died!" << std::endl;
 
     return 0;
 }

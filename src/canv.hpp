@@ -1,9 +1,9 @@
 #include <ncurses.h>
+#include <iostream>
+#include <vector>
 #include "sprites.hpp"
 #include "settings.hpp"
-#include <format>
-#include <vector>
-using namespace std;
+using std::to_string, std::vector, std::string;
 
 class Game
 {
@@ -11,7 +11,8 @@ class Game
         int width;
         int height;
         bool alive;
-        Snake* player = new Snake(2, 5, width, height);
+        Snake* player = new Snake(2, 5);
+        Tail* body = new Tail;
         Apple* target = new Apple(6, 5);
         double tick;
 
@@ -21,7 +22,8 @@ class Game
             height = h;
             alive = true;
             player->setd(width, height);
-            tick = Canvas::FPL;
+            body->add_tail(player->pos[0], player->pos[1]);
+            tick = Canvas::TPL;
 
             initscr();
             clear();
@@ -30,16 +32,18 @@ class Game
             curs_set(0);
 
             srand(time(NULL));
+
         }
 
         void run() {
-            if (tick >= Canvas::FPL) {
+            if (tick >= Canvas::TPL) {
                 input();
                 player->update();
+                body->update_tail(player->pos[0], player->pos[1]);
                 tick = 0;
                 
             } else {
-                tick += 1/Canvas::FPL;
+                tick += 1/Canvas::TPL;
             }
 
             Game::update();
@@ -47,14 +51,20 @@ class Game
 
         void update() {
             Game::draw();
-            // printf("Tick is at %f\n", tick);
         }
 
         void draw() {
             clear();
             drawCanvas();
             mvprintw(target->pos[1], target->pos[0], Canvas::apple);
+            int width_count = 0;
+            // mvprintw(height+3, 0, to_string(body->positions.size()).c_str());
+            for (std::vector<int> pos : body->positions) {
+                mvprintw(pos[1], pos[0], Canvas::body);
+                width_count += 4;
+            }
             mvprintw(player->pos[1], player->pos[0], Canvas::snake);
+
             /*
             mvprintw(height+3, 0, to_string(player->pos[0]).c_str());
             mvprintw(height+3, 5, to_string(player->pos[1]).c_str());
@@ -63,19 +73,16 @@ class Game
             */
             if (player->pos[0] == target->pos[0] && player->pos[1] == target->pos[1]) {
                 newApple();
-                mvprintw(height+3, 0, to_string(player->pos[0]).c_str());
-                mvprintw(height+3, 5, to_string(player->pos[1]).c_str());
-                mvprintw(height+4, 0, to_string(target->pos[0]).c_str());
-                mvprintw(height+4, 5, to_string(target->pos[1]).c_str());
+                body->add_tail(player->direction);
             }
             refresh();
         }
 
         void input() {
-            keypad(stdscr, TRUE); // Check whether there is input, function from ncurses
+            keypad(stdscr, TRUE);
             halfdelay(1); 
 
-            int c = getch(); // Save the typed key by gamer
+            int c = getch();
 
             switch(c)
             {
