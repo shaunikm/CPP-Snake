@@ -3,7 +3,9 @@
 #include <vector>
 #include "sprites.hpp"
 #include "settings.hpp"
-using std::to_string, std::vector, std::string;
+using std::to_string;
+using std::vector;
+using std::string;
 
 class Game
 {
@@ -11,42 +13,46 @@ class Game
         int width;
         int height;
         bool alive;
-        Snake* player = new Snake(2, 5);
-        Tail* body = new Tail;
-        Apple* target = new Apple(6, 5);
+        bool running;
+        Snake* player;
+        Tail* body;
+        Apple* target;
         double tick;
 
         Game(int w, int h)
         {
-            width = w;
-            height = h;
-            alive = true;
-            player->setd(width, height);
-            body->add_tail(player->pos[0], player->pos[1]);
-            tick = Canvas::TPL;
+            this->width = w;
+            this->height = h;
+            this->alive = true;
+            this->running = true;
+            this->player = new Snake(2, 5);
+            this->body = new Tail;
+            this->target = new Apple(9, 5);
+            this->player->setd(this->width, this->height);
+            this->body->add_tail(player->pos[0], player->pos[1]);
+            this->tick = Canvas::TPL;
+            
 
             initscr();
             clear();
             noecho();
             cbreak();
             curs_set(0);
-
-            srand(time(NULL));
-
         }
 
         void run() {
             if (tick >= Canvas::TPL) {
-                input();
-                player->update();
-                body->update_tail(player->pos[0], player->pos[1]);
-                tick = 0;
-                
+                this->input();
+                if (alive) {
+                    this->body->update_tail(player->pos[0], player->pos[1]);
+                    this->player->update();
+                }
+                this->tick = 0;
+                this->Game::checkDeath();
             } else {
-                tick += 1/Canvas::TPL;
+                this->tick += 1/Canvas::TPL;
             }
-
-            Game::update();
+            this->update();
         }
 
         void update() {
@@ -55,26 +61,22 @@ class Game
 
         void draw() {
             clear();
-            drawCanvas();
-            mvprintw(target->pos[1], target->pos[0], Canvas::apple);
-            int width_count = 0;
-            // mvprintw(height+3, 0, to_string(body->positions.size()).c_str());
-            for (std::vector<int> pos : body->positions) {
-                mvprintw(pos[1], pos[0], Canvas::body);
-                width_count += 4;
-            }
-            mvprintw(player->pos[1], player->pos[0], Canvas::snake);
+            this->drawCanvas();
+            mvprintw(this->target->pos[1], this->target->pos[0], Canvas::apple.c_str());
 
-            /*
-            mvprintw(height+3, 0, to_string(player->pos[0]).c_str());
-            mvprintw(height+3, 5, to_string(player->pos[1]).c_str());
-            mvprintw(height+4, 0, to_string(target->pos[0]).c_str());
-            mvprintw(height+4, 5, to_string(target->pos[1]).c_str());
-            */
-            if (player->pos[0] == target->pos[0] && player->pos[1] == target->pos[1]) {
-                newApple();
-                body->add_tail(player->direction);
+            for (std::vector<int> pos : this->body->positions) {
+                mvprintw(pos[1], pos[0], Canvas::body.c_str());
             }
+            mvprintw(player->pos[1], player->pos[0], Canvas::snake.c_str());
+
+            if (this->player->pos[0] == this->target->pos[0] && this->player->pos[1] == this->target->pos[1]) {
+                this->newApple();
+                this->body->add_tail(player->direction);
+            }
+
+            mvprintw((int)Canvas::height/2, Canvas::width+4, "Press escape to quit");
+            this->alive ? mvprintw((int)Canvas::height/2-1, Canvas::width+4, "Game running...") : mvprintw((int)Canvas::height/2-1, Canvas::width+4, "You died!");
+
             refresh();
         }
 
@@ -87,45 +89,54 @@ class Game
             switch(c)
             {
                 case KEY_LEFT:
-                    player->direction = LEFT;
+                    this->player->direction = LEFT;
                     break;
                 case KEY_RIGHT:
-                    player->direction = RIGHT;
+                    this->player->direction = RIGHT;
                     break;
                 case KEY_DOWN:
-                    player->direction = DOWN;
+                    this->player->direction = DOWN;
                     break;
                 case KEY_UP:
-                    player->direction = UP;
+                    this->player->direction = UP;
                     break;
                 case 27:
-                    alive = false;
+                    this->running = false;
                     break;
             }
         }
 
         void newApple() {
-            delete target;
-            target = new Apple((rand() % width) + 1, (rand() % height) + 1);
+            delete this->target;
+            this->target = new Apple((rand() % this->width) + 1, (rand() % this->height) + 1);
         }
 
         void cleanUp() {
             getch();
             endwin();
-            delete player;
-            delete target;
-            delete body;
+            delete this->player;
+            delete this->target;
+            delete this->body;
         }
 
         void drawCanvas() {
-            for (int w=0; w <= width+1; w++) {
-                mvprintw(0, w, Canvas::border);
-                mvprintw(height+1, w, Canvas::border);
+            for (int w=0; w <= this->width+1; w++) {
+                mvprintw(0, w, Canvas::border.c_str());
+                mvprintw(this->height+1, w, Canvas::border.c_str());
             }
 
-            for (int h=1; h <= height; h++) {
-                mvprintw(h, 0, Canvas::border);
-                mvprintw(h, width+1, Canvas::border);
+            for (int h=1; h <= this->height; h++) {
+                mvprintw(h, 0, Canvas::border.c_str());
+                mvprintw(h, this->width+1, Canvas::border.c_str());
+            }
+        }
+
+        void checkDeath() {
+            for (int i=1; i < this->body->positions.size(); i++) {
+                if (this->body->positions[i][0] == this->player->pos[0] && this->body->positions[i][1] == this->player->pos[1]) {
+                    this->alive = false;
+                    this->player->direction = NONE;
+                }
             }
         }
 };
