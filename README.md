@@ -7,7 +7,11 @@ A simple console-based snake game. The game is fit to compile in MacOS. As such,
 ##### Instructions to run file:
 Download it the game here: [main](https://github.com/shaunikm/CPP-Snake/releases/download/Latest/main). After downloading, run this command:
 ```
-chmod +x {file's directory}/main
+chmod +x {file's directory}/main && ./main
+```
+**Alternatively**, you could also run this in your terminal and skip a few steps:
+```
+curl -o snake-game -LJO https://github.com/shaunikm/CPP-Snake/releases/download/Latest/main && chmod +x ./snake-game && ./snake-game
 ```
 
 
